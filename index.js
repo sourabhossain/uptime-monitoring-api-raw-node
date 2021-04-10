@@ -20,13 +20,12 @@ app.config = {
 // create server
 app.createServer = () => {
     const server = http.createServer(app.handleReqRes);
-
     server.listen(app.config.port, () => {
         console.log(`listening to port ${app.config.port}`);
     });
 };
 
-// handle request response
+// handle Request Response
 app.handleReqRes = handleReqRes;
 
 // start the server
