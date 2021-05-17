@@ -15,7 +15,6 @@ const handler = {};
 
 handler.userHandler = (requestProperties, callback) => {
     const acceptedMethods = ['get', 'post', 'put', 'delete'];
-
     if (acceptedMethods.indexOf(requestProperties.method) > -1) {
         handler._users[requestProperties.method](requestProperties, callback);
     } else {
@@ -67,7 +66,6 @@ handler._users.post = (requestProperties, callback) => {
                     password: hash(password),
                     tosAgreement,
                 };
-
                 // store the user to db
                 data.create('users', phone, userObject, (err2) => {
                     if (!err2) {
@@ -99,12 +97,10 @@ handler._users.get = (requestProperties, callback) => {
         requestProperties.queryStringObject.phone.trim().length === 11
             ? requestProperties.queryStringObject.phone
             : false;
-
     if (phone) {
         // lookup the user
         data.read('users', phone, (err, u) => {
             const user = { ...parseJSON(u) };
-
             if (!err && user) {
                 delete user.password;
                 callback(200, user);
@@ -150,7 +146,7 @@ handler._users.put = (requestProperties, callback) => {
 
     if (phone) {
         if (firstName || lastName || password) {
-            // lookup the user
+            // loopkup the user
             data.read('users', phone, (err1, uData) => {
                 const userData = { ...parseJSON(uData) };
 
@@ -158,11 +154,9 @@ handler._users.put = (requestProperties, callback) => {
                     if (firstName) {
                         userData.firstName = firstName;
                     }
-
                     if (lastName) {
                         userData.firstName = firstName;
                     }
-
                     if (password) {
                         userData.password = hash(password);
                     }
