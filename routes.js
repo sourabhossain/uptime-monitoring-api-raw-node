@@ -1,21 +1,21 @@
 /**
- * Title: Routes
- * Description: Application Routes
- * Author: Sourab Hossain
- * Date: 04/10/2021
- */
+* Title: routes
+* Description: it's maintain all routes by path name
+* Author: Sourab Hossain
+*/
 
-// dependencies
-const { sampleHandler } = require('./handlers/routeHandlers/sampleHandler');
-const { userHandler } = require('./handlers/routeHandlers/userHandler');
-const { tokenHandler } = require('./handlers/routeHandlers/tokenHandler');
-const { checkHandler } = require('./handlers/routeHandlers/checkHandler.js');
+// relative dependencies
+const { rootHandler } = require('./handlers/rootHandler');
+const { notFoundHandler } = require('./handlers/notFoundHandler');
+const { userHandler } = require('./handlers/userHandler');
+const { tokenHandler } = require('./handlers/tokenHandler');
 
+// All routes object
 const routes = {
-    sample: sampleHandler,
+    '/': rootHandler,
     user: userHandler,
     token: tokenHandler,
-    check: checkHandler,
+    notFound: notFoundHandler
 };
 
 module.exports = routes;

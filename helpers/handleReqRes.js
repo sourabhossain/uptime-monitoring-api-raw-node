@@ -1,65 +1,56 @@
-/**
- * Title: Handle Request Response
- * Description: Handle Request and Response
- * Author: Sourab Hossain
- * Date: 09-04-2021
- */
-
-// dependencies
+// module dependencies
 const url = require('url');
 const { StringDecoder } = require('string_decoder');
+
+// relative dependencies
 const routes = require('../routes');
-const { notFoundHandler } = require('../handlers/routeHandlers/notFoundHandler');
-const { parseJSON } = require('./utilities');
+const { jsonParser } = require('../lib/util');
 
-// modue scaffolding
-const handler = {};
-
-handler.handleReqRes = (req, res) => {
-    // request handling
-    // get the url and parse it
-    const parsedUrl = url.parse(req.url, true);
-    const path = parsedUrl.pathname;
-    const trimmedPath = path.replace(/^\/+|\/+$/g, '');
+// handle request and response
+exports.handleReqRes = (req, res) => {
+    // Handle Request
+    const parseUrl = url.parse(req.url, true);
+    const path = parseUrl.pathname;
+    const trimmedPath = path.replace(/^\/+|\/+$/g, '') || '/';
+    const queryStringObject = parseUrl.query;
     const method = req.method.toLowerCase();
-    const queryStringObject = parsedUrl.query;
-    const headersObject = req.headers;
-
-    const requestProperties = {
-        parsedUrl,
+    const headerObject = req.headers;
+    
+    // request object
+    const handleRequestObject = {
+        parseUrl,
+        queryStringObject,
         path,
         trimmedPath,
         method,
-        queryStringObject,
-        headersObject,
-    };
+        headerObject
+    }
 
+    // choose handler by req routes
+    const chosenHandler = routes[trimmedPath] ? routes[trimmedPath] : routes.notFound;
+
+    // decode the buffers
     const decoder = new StringDecoder('utf-8');
-    let realData = '';
+    let textContent = '';
 
-    const chosenHandler = routes[trimmedPath] ? routes[trimmedPath] : notFoundHandler;
-
-    req.on('data', (buffer) => {
-        realData += decoder.write(buffer);
-    });
+    req.on('data', buffer => {
+        textContent += decoder.write(buffer);
+    })
 
     req.on('end', () => {
-        realData += decoder.end();
+        textContent += decoder.end();
 
-        requestProperties.body = parseJSON(realData);
+        // parse textContent Json to object
+        handleRequestObject.body = jsonParser(textContent);
 
-        chosenHandler(requestProperties, (statusCode, payload) => {
-            statusCode = typeof statusCode === 'number' ? statusCode : 500;
-            payload = typeof payload === 'object' ? payload : {};
+        // Invoked the chosen handler
+        chosenHandler(handleRequestObject, (statusCode = 500, response = { message: 'nothing response 😶'}) => {
+            const jsonResponse = JSON.stringify(response);
 
-            const payloadString = JSON.stringify(payload);
-
-            // return the final response
             res.setHeader('Content-Type', 'application/json');
             res.writeHead(statusCode);
-            res.end(payloadString);
-        });
-    });
-};
 
-module.exports = handler;
+            return res.end(jsonResponse);
+        })
+    })
+}

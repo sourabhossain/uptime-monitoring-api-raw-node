@@ -1,50 +1,29 @@
 /**
- * Title: Environments
- * Description: Handle all environment related things
- * Author: Sourab Hossain
- * Date: 10-04-2021
- */
-
-// dependencies
+* Title: Environment
+* Description: Configure the environment variables
+* Author: Sourab Hossain
+*/
 
 // module scaffolding
-const environments = {};
+const environment = {};
 
-// staging environment
-environments.staging = {
+// development modes
+environment.development = {
+    mode: 'development',
     port: 3000,
-    envName: 'staging',
-    secretKey: 'hsjdhsdhsjdhjshdjshd',
-    maxChecks: 5,
-    twilio: {
-        fromPhone: '',
-        accountSid: '',
-        authToken: '',
-    },
+    secretKey: 'development'
 };
 
-// production environment
-environments.production = {
+environment.production = {
+    mode: 'production',
     port: 5000,
-    envName: 'production',
-    secretKey: 'djkdjskdjksdjksjdskjd',
-    maxChecks: 5,
-    twilio: {
-        fromPhone: '',
-        accountSid: '',
-        authToken: '',
-    },
-};
+    secretKey: 'production',
+}
 
-// determine which environment was passed
-const currentEnvironment =
-    typeof process.env.NODE_ENV === 'string' ? process.env.NODE_ENV : 'staging';
+// chose the environment mode by environment variables
+const environmentVariable = process.env.NODE_ENV;
+const chosenEnvironment = typeof (environmentVariable) === 'string'
+    ? environment[environmentVariable]
+    : environment.development;
 
-// export corresponding environment object
-const environmentToExport =
-    typeof environments[currentEnvironment] === 'object'
-        ? environments[currentEnvironment]
-        : environments.staging;
-
-// export module
-module.exports = environmentToExport;
+module.exports = chosenEnvironment;
